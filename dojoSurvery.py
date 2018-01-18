@@ -6,8 +6,9 @@
 # and displaying that information. 
 
 
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, redirect, request, session, flash
 app = Flask(__name__)
+app.secret_key = 'KeepItSecretKeepItSafe'
 # our index route will handle rendering our form
 
 #1
@@ -29,14 +30,27 @@ def data():
    print "*", location
    print "*", language
    print "*", comment
-   return render_template("data.html", myname = name, mylocation = location, mylanguage = language, mycomment = comment)
+   print len(request.form['name'])
+   print len(comment)
+   if len(request.form['name']) < 1 and len(comment) < 1:
+      flash("name cannot be blank!")
+      flash("comment cannot be blank!")
+      return redirect('/') 
+   elif len(request.form['name']) < 1:
+      flash("name cannot be blank!")
+      return redirect('/') 
+   elif len(comment) < 1:
+      flash("comment cannot be blank!")
+      return redirect('/') 
+   elif len(comment) > 120:
+      flash("comment cannot be longer than 120 characters!")
+      return redirect('/')
+   else:
+      # flash("Success!")
+      return render_template("data.html", myname = name, mylocation = location, mylanguage = language, mycomment = comment)
+
+
+   
    
 app.run(debug=True) # run our server
 
-
-# Just for reference, here is the form html
-# <form action='/process' method='post'>
-#     <p>Your Name:<input type='text' name='name'></p>
-#     <p>Dojo Location:<input type='text' name='location'></p>
-#     <p>Favorite Language:<input type='text' name='language'></p>
-#     <p>Comment:<input type='text' name='comment'></p>
